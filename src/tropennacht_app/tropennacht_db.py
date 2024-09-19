@@ -62,26 +62,62 @@ def add_user_city(user_id: str, city: str):
         session.close()
 
 
-# Function to delete a row by id
-def delete_user_city_by_id(city_id: str):
+# Function to delete a row by id and user_id (to ensure user ownership)
+def delete_user_city_by_id(user_id: str, city_id: str):
     try:
-        # Ensure city_id is a valid UUID
+        # Ensure both user_id and city_id are valid UUIDs
+        user_id = uuid.UUID(user_id)
         city_id = uuid.UUID(city_id)
 
-        # Query for the entry with the given ID
-        entry_to_delete = session.query(UsersCities).filter_by(id=city_id).first()
+        # Query for the entry with the given city_id and user_id
+        entry_to_delete = (
+            session.query(UsersCities).filter_by(id=city_id, user_id=user_id).first()
+        )
+
         if entry_to_delete:
             # Delete the entry from the session
             session.delete(entry_to_delete)
             # Commit the session to persist the changes
             session.commit()
-            print(f"Deleted user city with ID {city_id}")
+            print(f"Deleted city with ID {city_id} for user {user_id}")
         else:
-            print(f"No entry found with ID {city_id}")
+            print(f"No entry found for user {user_id} with city ID {city_id}")
     except ValueError:
-        print(f"Invalid UUID: {city_id}")
+        print(f"Invalid UUID: {user_id} or {city_id}")
     except Exception as e:
         session.rollback()
-        print(f"Error deleting user city: {e}")
+        print(f"Error deleting city: {e}")
+    finally:
+        session.close()
+
+
+# Function to get all cities (id and name) for a user
+def get_cities_for_user(user_id: str):
+    try:
+        # Ensure user_id is a valid UUID
+        user_id = uuid.UUID(user_id)
+
+        # Query all cities associated with the given user_id, including both id and city
+        cities = (
+            session.query(UsersCities.id, UsersCities.city)
+            .filter_by(user_id=user_id)
+            .all()
+        )
+
+        if cities:
+            # Create a list of dictionaries with both id and city name
+            city_list = [{"id": str(city.id), "city": city.city} for city in cities]
+            print(f"Cities for user {user_id}: {city_list}")
+            return city_list
+        else:
+            print(f"No cities found for user {user_id}")
+            return []
+    except ValueError:
+        print(f"Invalid UUID: {user_id}")
+        return []
+    except Exception as e:
+        session.rollback()
+        print(f"Error fetching cities for user {user_id}: {e}")
+        return []
     finally:
         session.close()
