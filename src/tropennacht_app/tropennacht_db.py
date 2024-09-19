@@ -1,10 +1,9 @@
 import os
-from datetime import datetime
 import uuid
 
-from sqlalchemy import Column, Date, ForeignKey, Integer, String, Text, create_engine
+from sqlalchemy import Column, String, create_engine
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship, sessionmaker
+from sqlalchemy.orm import sessionmaker
 
 from sqlalchemy.dialects.postgresql import UUID  # for PostgreSQL UUID support
 

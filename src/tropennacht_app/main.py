@@ -1,13 +1,13 @@
-from fastapi import FastAPI, Request, Depends, HTTPException, status
-from fastapi.staticfiles import StaticFiles
-
-from fastapi.responses import HTMLResponse, RedirectResponse
-from fastapi.templating import Jinja2Templates
-from starlette.middleware.sessions import SessionMiddleware
-from supabase import create_client, Client
 import os
-from tropennacht_db import add_user_city, delete_user_city_by_id, get_cities_for_user
+
+from fastapi import Depends, FastAPI, Request
+from fastapi.responses import HTMLResponse, RedirectResponse
+from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 from generate_calendar import generate_tropical_nights_plot
+from starlette.middleware.sessions import SessionMiddleware
+from supabase import Client, create_client
+from tropennacht_db import add_user_city, delete_user_city_by_id, get_cities_for_user
 
 app = FastAPI()
 
@@ -40,7 +40,7 @@ async def post_signup(request: Request):
     email = form.get("email")
     password = form.get("password")
     try:
-        response = supabase.auth.sign_up({"email": email, "password": password})
+        _ = supabase.auth.sign_up({"email": email, "password": password})
         return RedirectResponse("/login", status_code=302)
     except Exception as e:
         return templates.TemplateResponse(
@@ -63,7 +63,7 @@ async def post_login(request: Request):
         response = supabase.auth.sign_in_with_password(
             {"email": email, "password": password}
         )
-        access_token = response.session.access_token
+        _ = response.session.access_token
         user = response.user
         # Store user info in the session
         request.session["user"] = {"email": user.email, "id": user.id}
