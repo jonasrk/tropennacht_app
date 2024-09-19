@@ -13,12 +13,17 @@ app = FastAPI()
 
 app.mount("/static", StaticFiles(directory="static"), name="static")
 
-# Add session middleware
-app.add_middleware(SessionMiddleware, secret_key=os.getenv("SESSION_KEY"))
+SESSION_KEY = os.getenv("SESSION_KEY")
+
+if not SESSION_KEY:
+    raise EnvironmentError(
+        "The environment variable SESSION_KEY is not set. Please set it before running the application."
+    )
+
+app.add_middleware(SessionMiddleware, secret_key=SESSION_KEY)
 
 templates = Jinja2Templates(directory="templates")
 
-# Initialize Supabase client
 supabase_url = os.getenv("SUPABASE_URL")
 supabase_key = os.getenv("SUPABASE_KEY")
 supabase: Client = create_client(supabase_url, supabase_key)
@@ -35,9 +40,7 @@ async def post_signup(request: Request):
     email = form.get("email")
     password = form.get("password")
     try:
-        # Sign up the user
         response = supabase.auth.sign_up({"email": email, "password": password})
-        # Redirect to login page
         return RedirectResponse("/login", status_code=302)
     except Exception as e:
         return templates.TemplateResponse(
