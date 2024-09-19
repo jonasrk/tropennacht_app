@@ -6,6 +6,7 @@ from fastapi.templating import Jinja2Templates
 from starlette.middleware.sessions import SessionMiddleware
 from supabase import create_client, Client
 import os
+from tropennacht_db import add_user_city, delete_user_city_by_id
 
 app = FastAPI()
 
@@ -66,17 +67,26 @@ async def logout(request: Request):
     return RedirectResponse("/login", status_code=302)
 
 
+
+@app.get("/public", response_class=HTMLResponse)
+async def public_route(request: Request):
+    return templates.TemplateResponse("public.html", {"request": request})
+
+# --- protected below
 def get_current_user(request: Request):
     user = request.session.get("user")
     if not user:
         return RedirectResponse("/login", status_code=302)
     return user
 
-@app.get("/public", response_class=HTMLResponse)
-async def public_route(request: Request):
-    return templates.TemplateResponse("public.html", {"request": request})
-
-
 @app.get("/protected", response_class=HTMLResponse)
 async def protected_route(request: Request, user: dict = Depends(get_current_user)):
+    return templates.TemplateResponse("protected.html", {"request": request, "user": user})
+
+@app.post("/city", response_class=HTMLResponse)
+async def add_city(request: Request, user: dict = Depends(get_current_user)):
+    user_id = user["id"]
+    form = await request.form()
+    city = form.get("city")
+    add_user_city(user_id=user_id, city=city)
     return templates.TemplateResponse("protected.html", {"request": request, "user": user})
