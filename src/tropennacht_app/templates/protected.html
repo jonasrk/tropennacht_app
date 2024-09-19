@@ -17,6 +17,13 @@
         <input type="hidden" name="city_id" value="{{ city.id }}">
         <button type="submit" class="btn btn-danger btn-sm">Delete</button>
       </form>
+      <h1>Weather Data for {{ city.city }}</h1>
+
+      <h2>Tropical Nights Overview</h2>
+      <div>
+        <!-- Render the Plotly chart -->
+        {{ city.plot_html|safe }}
+      </div>
     </li>
   {% endfor %}
 </ul>

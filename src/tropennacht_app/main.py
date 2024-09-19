@@ -7,6 +7,7 @@ from starlette.middleware.sessions import SessionMiddleware
 from supabase import create_client, Client
 import os
 from tropennacht_db import add_user_city, delete_user_city_by_id, get_cities_for_user
+from generate_calendar import generate_tropical_nights_plot
 
 app = FastAPI()
 
@@ -98,8 +99,17 @@ async def protected_route(request: Request, user: dict = Depends(get_current_use
 
     cities = get_cities_for_user(user["id"])
 
+    # Generate tropical nights plot
+    plot_html = generate_tropical_nights_plot(
+        # city_info["name"], city_info["lat"], city_info["lon"]
+    )
+
+    for city in cities:
+        city["plot_html"] = plot_html
+
     return templates.TemplateResponse(
-        "protected.html", {"request": request, "user": user, "cities": cities}
+        "protected.html",
+        {"request": request, "user": user, "cities": cities},
     )
 
 
