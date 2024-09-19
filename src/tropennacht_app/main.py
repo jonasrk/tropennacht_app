@@ -81,12 +81,21 @@ def get_current_user(request: Request):
 
 @app.get("/protected", response_class=HTMLResponse)
 async def protected_route(request: Request, user: dict = Depends(get_current_user)):
+
+    if type(user) is not dict:
+        return RedirectResponse("/login", status_code=302)
+    if not user.get("id", None):
+        return RedirectResponse("/login", status_code=302)
     return templates.TemplateResponse("protected.html", {"request": request, "user": user})
 
 @app.post("/city", response_class=HTMLResponse)
 async def add_city(request: Request, user: dict = Depends(get_current_user)):
+    if type(user) is not dict:
+        return RedirectResponse("/login", status_code=302)
+    if not user.get("id", None):
+        return RedirectResponse("/login", status_code=302)
     user_id = user["id"]
     form = await request.form()
     city = form.get("city")
     add_user_city(user_id=user_id, city=city)
-    return templates.TemplateResponse("protected.html", {"request": request, "user": user})
+    return RedirectResponse("/protected", status_code=302)

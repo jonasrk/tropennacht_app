@@ -7,4 +7,20 @@
 <p>Welcome, {{ user.email }}!</p>
 
 <p>Your cities:</p>
+
+<form method="post" action="/city">
+    <div class="form-group">
+      <label for="city">city name</label>
+      <input
+        type="city"
+        class="form-control"
+        id="city"
+        name="city"
+        required
+      >
+    </div>
+
+    <button type="submit" class="btn btn-primary">Add city</button>
+  </form>
+
 {% endblock %}
