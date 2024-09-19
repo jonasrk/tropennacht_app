@@ -1,0 +1,14 @@
+{% extends "base.html" %}
+
+{% block title %}Protected Page{% endblock %}
+
+{% block content %}
+<h1>Protected Page</h1>
+<p>Welcome, {{ user.email }}!</p>
+
+<p>{{ city_id }}</p>
+
+{{ plot_html|safe }}
+
+
+{% endblock %}

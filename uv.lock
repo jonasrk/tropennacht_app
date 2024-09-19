@@ -1191,6 +1191,15 @@ wheels = [
 ]
 
 [[package]]
+name = "tabulate"
+version = "0.9.0"
+source = { registry = "https://mckinsey.jfrog.io/artifactory/api/pypi/python/simple" }
+sdist = { url = "https://mckinsey.jfrog.io/artifactory/api/pypi/python/packages/packages/ec/fe/802052aecb21e3797b8f7902564ab6ea0d60ff8ca23952079064155d1ae1/tabulate-0.9.0.tar.gz", hash = "sha256:0095b12bf5966de529c0feb1fa08671671b3368eec77d7ef7ab114be2c068b3c" }
+wheels = [
+    { url = "https://mckinsey.jfrog.io/artifactory/api/pypi/python/tabulate-0.9.0-py3-none-any.whl", hash = "sha256:024ca478df22e9340661486f85298cff5f6dcdba14f3813e8830015b9ed1948f" },
+]
+
+[[package]]
 name = "tenacity"
 version = "9.0.0"
 source = { registry = "https://mckinsey.jfrog.io/artifactory/api/pypi/python/simple" }
@@ -1224,6 +1233,7 @@ dependencies = [
     { name = "python-jose", extra = ["cryptography"] },
     { name = "sqlalchemy" },
     { name = "supabase" },
+    { name = "tabulate" },
     { name = "vcrpy" },
 ]
 
@@ -1245,11 +1255,12 @@ requires-dist = [
     { name = "python-jose", extras = ["cryptography"], specifier = ">=3.3.0" },
     { name = "sqlalchemy", specifier = ">=2.0.35" },
     { name = "supabase", specifier = ">=2.7.4" },
+    { name = "tabulate" },
     { name = "vcrpy", specifier = ">=6.0.1" },
 ]
 
 [package.metadata.requires-dev]
-dev = [{ name = "ruff" }]
+dev = [{ name = "ruff", specifier = ">=0.6.5" }]
 
 [[package]]
 name = "typer"

@@ -12,32 +12,25 @@
 <ul class="list-group">
   {% for city in cities %}
     <li class="list-group-item d-flex justify-content-between align-items-center">
-      {{ city.city }}
+     
+      <a class="btn btn-primary" href="/city/{{ city.id }}" role="button">{{ city.city }}</a>
       <form method="post" action="/delete_city" style="display:inline;">
         <input type="hidden" name="city_id" value="{{ city.id }}">
         <button type="submit" class="btn btn-danger btn-sm">Delete</button>
       </form>
-      <h1>Weather Data for {{ city.city }}</h1>
 
-      <h2>Tropical Nights Overview</h2>
-      <div>
-        <!-- Render the Plotly chart -->
-        {{ city.plot_html|safe }}
-      </div>
     </li>
   {% endfor %}
 </ul>
 
 <form method="post" action="/city">
     <div class="form-group">
-      <label for="city">city name</label>
-      <input
-        type="city"
-        class="form-control"
-        id="city"
-        name="city"
-        required
-      >
+      <select class="form-select" aria-label="Default select example">
+        <option selected>Open this select menu</option>
+        {% for city_option_name in city_options %}
+          <option value="{{ city_option_name }}">{{ city_option_name }}</option>
+        {% endfor %}
+      </select>
     </div>
 
     <button type="submit" class="btn btn-primary">Add city</button>

@@ -1,12 +1,11 @@
-from meteostat import Point, Hourly
+import os
 from datetime import datetime, timedelta
+
 import pandas as pd
 import plotly_calplot
 import vcr
-
-import os
 from cachetools import TTLCache, cached
-
+from meteostat import Hourly, Point
 
 # Function to generate tropical nights plot for a given city
 
@@ -16,22 +15,26 @@ cache = TTLCache(maxsize=float("inf"), ttl=60 * 60 * 24)
 
 
 @cached(cache)
-def generate_tropical_nights_plot(city_name=None, lat=None, lon=None):
+def generate_tropical_nights_plot(lat, lon):
     current_dir = os.path.dirname(__file__)
     cassette_path = os.path.join(current_dir, "vcr_weather_api.yaml")
 
-    with vcr.use_cassette(cassette_path):
-        # Define location and time range
-        # Define Berlin location and time range
+    my_vcr = vcr.VCR(
+        record_mode="new_episodes",  # This mode allows recording new interactions if no match is found
+        cassette_library_dir=cassette_path,  # Directory where cassettes will be saved
+    )
 
-        berlin = Point(52.52, 13.405)
+    with my_vcr.use_cassette(cassette_path):
+        # Define location and time range
+
+        city = Point(lat, lon)
         start = datetime(
             datetime.now().year - 5, datetime.now().month, datetime.now().day
         )
         end = datetime(datetime.now().year, datetime.now().month, datetime.now().day)
 
         # Fetch weather data
-        data = Hourly(berlin, start, end).fetch()
+        data = Hourly(city, start, end).fetch()
 
         # Function to check if it's a tropical night
         def is_tropical_night(df, date):
@@ -46,11 +49,14 @@ def generate_tropical_nights_plot(city_name=None, lat=None, lon=None):
         for date in date_range:
             start_of_day = date
             end_of_day = date + timedelta(days=1)
-            daily_data = data.loc[start_of_day:end_of_day]
-            tropical_night = is_tropical_night(daily_data, start_of_day)
+            Hourly_data = data.loc[start_of_day:end_of_day]
+            tropical_night = is_tropical_night(Hourly_data, start_of_day)
             results.append({"date": start_of_day, "tropical_night": tropical_night})
 
         results_df = pd.DataFrame(results)
+        results_df["value"] = results_df["tropical_night"].astype(int)
+
+        # Add a column 'value' where 1 represents a tropical night, 0 otherwise
         results_df["value"] = results_df["tropical_night"].astype(int)
 
         # Summarize tropical nights by year
